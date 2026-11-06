@@ -56,6 +56,6 @@ Inspirado en la obra literaria de Isaac Asimov, sin afiliación con sus titulare
 ## Estado
 
 - EXP-001: formulación matemática inicial y ejemplos simulados; **sin validación empírica**.
-- EXP-002: pendiente — operacionalización de variables, fuentes históricas y modelos de referencia.
+- EXP-002: **implementado parcialmente** — lector CSV entidad-año, baseline histórico temporal, cálculo Brier y pruebas unitarias; [protocolo de variables y evaluación](research/EXP-002-plan.md). **Sin datos históricos incorporados ni validación empírica**. Pruebas automáticas: [ejecución satisfactoria](https://github.com/svampa-alt/Psicohistoria-lab/actions/runs/42207584555).
 
 Los avances futuros deben conservar un historial auditable y evitar duplicar experimentos o repositorios.
