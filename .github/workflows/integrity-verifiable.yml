@@ -1,0 +1,41 @@
+name: Repository integrity and verifiable runs
+on:
+  push:
+    paths-ignore:
+      - '.github/run-results/**'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check repository integrity (not scientific or commercial validation)
+        id: check
+        continue-on-error: true
+        run: |
+          test -s README.md
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          for p in Path('.').rglob('*.json'):
+              if '.git' not in p.parts: json.loads(p.read_text(encoding='utf-8'))
+          PY
+      - name: Persist run ID and outcome
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          CHECK_OUTCOME: ${{ steps.check.outcome }}
+        with:
+          script: |
+            const path = '.github/run-results/integrity.json';
+            const data = {run_id:context.runId,run_url:`https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,head_sha:context.sha,branch:context.ref.replace('refs/heads/',''),integrity:process.env.CHECK_OUTCOME,recorded_at:new Date().toISOString()};
+            let sha;
+            try {const previous=await github.rest.repos.getContent({...context.repo,path,ref:data.branch});sha=previous.data.sha;}
+            catch(e){if(e.status!==404)throw e;}
+            await github.rest.repos.createOrUpdateFileContents({...context.repo,path,sha,branch:data.branch,message:`ci: record integrity run ${context.runId} [skip ci]`,content:Buffer.from(JSON.stringify(data,null,2)+'\n').toString('base64')});
+      - name: Enforce integrity check
+        if: always()
+        run: test "${{ steps.check.outcome }}" = "success"
