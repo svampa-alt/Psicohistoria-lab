@@ -56,6 +56,6 @@ Inspirado en la obra literaria de Isaac Asimov, sin afiliación con sus titulare
 ## Estado
 
 - EXP-001: formulación matemática inicial y ejemplos simulados; **sin validación empírica**.
-- EXP-002: **implementado parcialmente** — lector CSV entidad-año, baseline histórico temporal, cálculo Brier y pruebas unitarias; [protocolo de variables y evaluación](research/EXP-002-plan.md). **Sin datos históricos incorporados ni validación empírica**. Pruebas automáticas: [ejecución satisfactoria](https://github.com/svampa-alt/Psicohistoria-lab/actions/runs/42207584555).
+- EXP-002: **implementado parcialmente** — lector CSV entidad-año, baselines B0 (tasa histórica global) y B1 (tasa por entidad contraída hacia la global), cálculo Brier y pruebas unitarias; [protocolo de variables y evaluación](research/EXP-002-plan.md). **Sin datos históricos incorporados ni validación empírica**. [Avance 002-B: ecuaciones, pruebas y contraste sintético negativo](research/EXP-002-plan.md#avance-diario-002-b-baseline-por-entidad-2026-11-07). Pruebas automáticas: [ejecución satisfactoria](https://github.com/svampa-alt/Psicohistoria-lab/actions/runs/42207584555).
 
 Los avances futuros deben conservar un historial auditable y evitar duplicar experimentos o repositorios.
