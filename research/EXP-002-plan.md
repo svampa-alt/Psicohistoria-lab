@@ -71,3 +71,39 @@ Datos de entrenamiento inventados: cuatro entidad-anios, eventos `[0,1,0,0]`. En
 
 ### Antecedentes y no duplicacion
 AUD-002: dmely/cliodynamics (modelo espacial de cohesion, no baseline). AUD-003: O957/awesome-cliodynamics (catalogo de datos). AUD-004: MidnightLabDev/Civitas (Brier, tasas base, sensibilidad, ledger). Se reutilizan ideas y ecuaciones estadisticas generales; no se copia codigo de terceros. Este registro **amplia EXP-002** en vez de abrir EXP-003.
+
+
+## Avance diario 002-B: baseline por entidad (2026-11-07)
+
+**Implementado en codigo, sin validacion empirica.** Se agrego `evaluate_entity_baseline` (B1) y pruebas de separacion temporal. No se incorporaron datos historicos de terceros. No se crearon tareas, proyectos ni repositorios.
+
+### Ecuacion
+Para entidad e y anio t, usando exclusivamente observaciones con anio menor que t:
+
+```
+p_global(t) = (K_<t + 0.5) / (N_<t + 1)
+p_B1(e,t) = (k_e,<t + lambda * p_global(t)) / (n_e,<t + lambda)
+```
+
+`lambda=5` por defecto es un supuesto no calibrado. Una entidad sin historial recibe exactamente la tasa global; una con muchos registros depende mas de su propia tasa. Todas las predicciones de un mismo anio se generan antes de actualizar contadores con los resultados de ese anio.
+
+### Calculo sintetico, no historico
+En 2000: A tiene evento=1 y B evento=0. Tasa global suavizada para 2001: (1+0.5)/(2+1)=0.5. Para demostracion con lambda=2:
+- A: (1+2*0.5)/(1+2)=2/3.
+- B: (0+2*0.5)/(1+2)=1/3.
+- C, entidad nueva: (0+2*0.5)/(0+2)=0.5.
+Si en 2001 los resultados sinteticos son A=0, B=1, C=1, Brier_B1=[(2/3)^2+(1/3-1)^2+(0.5-1)^2]/3=0.3796296296.
+Para B0, las tres probabilidades son 0.5, Brier_B0=0.25.
+**Resultado ilustrativo:** B1 es peor que B0 en este ejemplo; no es evidencia sobre historia.
+
+### Comando
+```bash
+python -m unittest discover -s tests -v
+python -m src.psicohistoria panel_local.csv --test-start 1900 --baseline B1 --strength 5
+```
+
+### Siguiente puerta de datos
+La base historica todavia no esta descargada. Priorizar fuente con unidad entidad-anio y etiqueta de inicio de evento definida, cobertura y licencia verificadas. Para guerras, distinguir inicio de guerra por estado, anios sin cobertura y codificacion de estados; no inferir ceros de ausencias. Para Seshat, complejidad social no es fragilidad institucional. No atribuir valor empirico a EXP-001 ni a B1 hasta evaluar fuera de muestra.
+
+### Registro de ejecucion
+Codigo y pruebas agregados en GitHub. El estado de GitHub Actions debe verificarse despues del ultimo commit; un run anterior exitoso no certifica los cambios nuevos.
