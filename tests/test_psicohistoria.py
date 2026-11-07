@@ -3,7 +3,7 @@ import csv
 import tempfile
 import unittest
 from pathlib import Path
-from src.psicohistoria import read_panel, brier, evaluate_baseline
+from src.psicohistoria import read_panel, brier, evaluate_baseline, evaluate_entity_baseline
 
 
 class TestBaseline(unittest.TestCase):
@@ -35,6 +35,26 @@ class TestBaseline(unittest.TestCase):
     def test_no_train_rejected(self):
         with self.assertRaises(ValueError):
             evaluate_baseline([{"entity": "A", "year": 2000, "outcome": 1}], 2000)
+
+
+    def test_b1_shrinkage_and_no_same_year_leakage(self):
+        rows = [
+            {"entity": "A", "year": 2000, "outcome": 1},
+            {"entity": "B", "year": 2000, "outcome": 0},
+            {"entity": "A", "year": 2001, "outcome": 0},
+            {"entity": "B", "year": 2001, "outcome": 1},
+            {"entity": "C", "year": 2001, "outcome": 1},
+        ]
+        out = evaluate_entity_baseline(rows, 2001, strength=2)
+        self.assertEqual(out["n_test"], 3)
+        self.assertAlmostEqual(out["predictions"][0]["p"], 2 / 3)
+        self.assertAlmostEqual(out["predictions"][1]["p"], 1 / 3)
+        self.assertAlmostEqual(out["predictions"][2]["p"], 0.5)
+
+    def test_b1_strength_invalid(self):
+        with self.assertRaises(ValueError):
+            evaluate_entity_baseline([{"entity": "A", "year": 2000, "outcome": 1},
+                                      {"entity": "A", "year": 2001, "outcome": 0}], 2001, strength=0)
 
 
 if __name__ == "__main__":
