@@ -57,5 +57,26 @@ class TestBaseline(unittest.TestCase):
                                       {"entity": "A", "year": 2001, "outcome": 0}], 2001, strength=0)
 
 
+
+class TestCoverageGate(unittest.TestCase):
+    def test_missing_is_not_automatically_zero(self):
+        from src.coverage import audit_panel
+        with tempfile.TemporaryDirectory() as d:
+            panel, coverage = Path(d)/"panel.csv", Path(d)/"coverage.csv"
+            panel.write_text("entity,year,outcome\nA,2000,1\n", encoding="utf-8")
+            coverage.write_text("entity,year\nA,2000\nB,2000\n", encoding="utf-8")
+            result = audit_panel(panel, coverage)
+            self.assertFalse(result["complete"])
+            self.assertEqual(result["missing_observed_rows"], 1)
+
+    def test_outside_coverage_rejected(self):
+        from src.coverage import audit_panel
+        with tempfile.TemporaryDirectory() as d:
+            panel, coverage = Path(d)/"panel.csv", Path(d)/"coverage.csv"
+            panel.write_text("entity,year,outcome\nB,2000,0\n", encoding="utf-8")
+            coverage.write_text("entity,year\nA,2000\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "fuera de cobertura"):
+                audit_panel(panel, coverage)
+
 if __name__ == "__main__":
     unittest.main()
