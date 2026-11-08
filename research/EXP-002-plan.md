@@ -107,3 +107,35 @@ La base historica todavia no esta descargada. Priorizar fuente con unidad entida
 
 ### Registro de ejecucion
 Codigo y pruebas agregados en GitHub. El estado de GitHub Actions debe verificarse despues del ultimo commit; un run anterior exitoso no certifica los cambios nuevos.
+
+## Avance diario 002-C: cobertura explicita y seleccion de fuente (2026-11-08)
+
+**Investigacion documental, codigo implementado; sin datos historicos incorporados ni contraste empirico.**
+
+### Fuentes oficiales revisadas
+- Correlates of War (COW), guerras interestatales v4.0, 1816-2007: https://correlatesofwar.org/data-sets/cow-war/ . La unidad del archivo de participantes es episodio de guerra por estado, no un panel completo de pais-anio. Es imprescindible unirlo con el universo de estados observados.
+- COW State System Membership v2024: https://correlatesofwar.org/data-sets/ . Define miembros del sistema estatal y permite construir un denominador explicito. No equivale automaticamente a cobertura completa de todos los eventos.
+- Uppsala Conflict Data Program (UCDP): https://ucdp.uu.se/downloads/ . Ofrece datasets con codebooks y licencia CC BY 4.0 (atribucion obligatoria), candidato alternativo para un experimento de conflicto diferente. No mezclar definiciones de UCDP y COW sin reconciliacion.
+- Las series de guerra COW v4.0 llegan hasta 2007; no tratar 2008-2026 como observaciones sin eventos.
+
+### Decision de datos
+**COW v4.0 + COW State System Membership** es candidato prioritario para evento `inicio de participacion estatal en guerra interestatal` durante 1816-2007. Se debe verificar el codebook antes de fijar si el inicio de un episodio cuenta una vez por guerra, una vez por participante o por reingreso. El universo de observaciones se construira solo para paises/anios cubiertos. La licencia y condiciones de redistribucion deben verificarse antes de publicar filas originales. No se descargaron archivos en este avance.
+
+### Nueva puerta de calidad implementada
+`src/coverage.py` define `audit_panel(panel.csv,coverage.csv)`. La cobertura es un CSV separado de entidad-anio explícitamente observable; el panel incluye `outcome` 0/1. El programa:
+1. Rechaza filas fuera del universo de cobertura, claves duplicadas, años invalidos y outcomes no binarios.
+2. Informa entidades-años cubiertos sin fila observada y marca `complete=false` en vez de imputar cero.
+3. Registra SHA-256 de ambos archivos para procedencia y repetibilidad.
+4. No valida por sí mismo que la fuente de cobertura sea correcta.
+
+**Ejemplo sintético:** cobertura `(A,2000),(B,2000)`; panel solo `(A,2000,1)`. Resultado esperado: `coverage_rows=2`, `panel_rows=1`, `missing_observed_rows=1`, `complete=false`. No se afirma que B haya tenido outcome=0.
+
+Ejecucion:
+```bash
+python -m unittest discover -s tests -v
+python -m src.coverage panel_local.csv cobertura_local.csv
+```
+El workflow de GitHub debe verificar las nuevas pruebas antes de afirmar exito. Los datos y el modelo EXP-001 siguen sin calibracion.
+
+### Proximo paso
+Verificar codebooks de COW para episodios y membresia, identificar nombres de columnas reales, construir un adaptador con controles de año y codigo de estado, y ejecutar B0/B1 en el mismo conjunto temporal de observaciones. Registrar n, prevalencia, Brier y diferencias; no elegir umbrales mirando el periodo de prueba.
