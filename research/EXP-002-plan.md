@@ -139,3 +139,32 @@ El workflow de GitHub debe verificar las nuevas pruebas antes de afirmar exito. 
 
 ### Proximo paso
 Verificar codebooks de COW para episodios y membresia, identificar nombres de columnas reales, construir un adaptador con controles de año y codigo de estado, y ejecutar B0/B1 en el mismo conjunto temporal de observaciones. Registrar n, prevalencia, Brier y diferencias; no elegir umbrales mirando el periodo de prueba.
+
+
+## Avance diario 002-D: adaptador COW y prueba temporal sintética (2026-11-09)
+
+**Estado: implementado y persistido; no hay datos COW descargados ni contraste histórico real.** Se revisaron README, EXP-002-A/B/C, auditorías previas y documentación oficial de COW antes de escribir.
+
+Fuentes primarias:
+- https://correlatesofwar.org/data-sets/state-system-membership/ : sistema v2024, archivo `system2024` con `CCode,Year`, listado estado-año de miembros presentes en algún momento del año.
+- https://correlatesofwar.org/wp-content/uploads/State-System-Membership-Codebook-V2024.pdf : diccionario oficial.
+- https://correlatesofwar.org/data-sets/cow-war/ : guerras interestatales v4.0, 1816–2007.
+- https://correlatesofwar.org/wp-content/uploads/Inter-StateWars_Codebook.pdf : `WarNum,Ccode,StartYear1`; el registro es participante-guerra, no estado-año; puede haber más de una fila por participante si cambia de bando.
+
+Código nuevo: `src/cow_adapter.py`. Lee **archivos locales aportados por el proveedor**; no descarga, publica ni redistribuye sus datos. Crea `panel.csv`, `coverage.csv`, `metadata.json` con SHA-256. La unidad es Estado COW-año, el resultado es **inicio de participación estatal en guerra** según `StartYear1` (no guerra global ni polarización). Ventana limitada a 1816–2007, intersección con membresía. Rechaza membresías duplicadas, años de inicio desconocidos (-9) y comienzos fuera del universo. Un estado-año con dos guerras se cuenta una sola vez.
+
+**Advertencia metodológica importante:** `system2024` incluye países que fueron miembros durante cualquier parte del año; esto no garantiza que un inicio de guerra ocurra después del ingreso al sistema. Tampoco se modela `StartYear2` ni reingresos; ambos aspectos deben resolverse con codebook y auditoría antes de declarar un panel histórico validado. Los ceros presuponen exhaustividad del catálogo de guerras durante la ventana; no son datos faltantes.
+
+Ejecución cuando se disponga de archivos COW legítimos:
+```bash
+python -m unittest discover -s tests -v
+python -m src.cow_adapter system2024.csv InterStateWarData_v4.0.csv --out-dir resultados_locales
+python -m src.coverage resultados_locales/panel.csv resultados_locales/coverage.csv
+python -m src.psicohistoria resultados_locales/panel.csv --test-start 1950 --baseline B0
+python -m src.psicohistoria resultados_locales/panel.csv --test-start 1950 --baseline B1 --strength 5
+```
+El corte 1950 es **ilustrativo y provisional**, no un protocolo fijado mediante exploración empírica. Los baselines usan resultados anteriores a cada año y se actualizan progresivamente. Se requieren auditoría de licencias, fecha de descarga, análisis de eventos y sensibilidad del corte antes de evaluar conclusiones.
+
+Prueba sintética definida en `tests/test_cow_adapter.py`: dos estados (CCode 2,20), 2000–2002; inicios (2,2000) y (20,2002), 6 estado-años y 2 positivos. Para 2001, B0=(1+0.5)/(2+1)=0.5; se contrastan B0/B1 en las mismas 4 observaciones de 2001–2002. Tests de rechazos de evento fuera de cobertura y fecha desconocida. **Las pruebas deben considerarse no ejecutadas hasta verificar el workflow nuevo**.
+
+Estado de evidencia: datos históricos incorporados=0; contraste histórico fuera de muestra=0; hipótesis EXP-001 validada=no. Próxima puerta: obtener archivos oficiales, verificar sus encabezados exactos y su contenido, revisar StartYear2 y reglas de participación y ejecutar la primera comparación con provenance completa.
