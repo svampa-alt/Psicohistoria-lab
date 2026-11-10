@@ -65,3 +65,5 @@ Inspirado en la obra literaria de Isaac Asimov, sin afiliación con sus titulare
 Los avances futuros deben conservar un historial auditable y evitar duplicar experimentos o repositorios.
 
 - EXP-002-E (2026-11-10): [comparación pareada B0/B1](src/compare_baselines.py), [pruebas sintéticas](tests/test_compare_baselines.py) y [protocolo con bootstrap anual](research/EXP-002-plan.md#avance-diario-002-e-contraste-pareado-reproducible-2026-11-10). **Código implementado; sin datos históricos procesados ni capacidad predictiva validada.** La reconciliación de episodios COW continúa pendiente.
+
+- EXP-002-F (2026-11-10): [ejemplo práctico mínimo y reproducible](research/EXP-002-F-ejemplo-practico.md) con dos entidades sintéticas y corte temporal 2002. Brier B0=0.25, B1=0.0625 con strength=2 **calculados analíticamente**; no son resultados históricos ni validación empírica. No se alteró el modelo EXP-001.
