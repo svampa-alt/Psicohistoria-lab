@@ -25,12 +25,12 @@ def build_panel(system_path, war_path):
     """system2024 (CCode,Year); InterStateWarData_v4.0 (Ccode,StartYear1,WarNum).
     Evento: comienzo de participacion estatal segun StartYear1, no comienzo de guerra global.
     """
-    system = read_csv(system_path, ("CCode", "Year"))
-    wars = read_csv(war_path, ("Ccode", "StartYear1", "WarNum"))
+    system = read_csv(system_path, ("ccode", "year"))
+    wars = read_csv(war_path, ("ccode", "StartYear1", "WarNum"))
     universe = set()
     for r in system:
-        c = integer(r["CCode"], "CCode sistema")
-        y = integer(r["Year"], "Year sistema")
+        c = integer(r["ccode"], "CCode sistema")
+        y = integer(r["year"], "Year sistema")
         if FIRST <= y <= LAST:
             if (c, y) in universe:
                 raise ValueError(f"membresia duplicada {(c,y)}")
@@ -39,7 +39,7 @@ def build_panel(system_path, war_path):
         raise ValueError("sin cobertura 1816-2007")
     events, outside, unknown = set(), [], 0
     for r in wars:
-        c = integer(r["Ccode"], "Ccode guerra")
+        c = integer(r["ccode"], "Ccode guerra")
         y = integer(r["StartYear1"], "StartYear1")
         if y == -9:
             unknown += 1
