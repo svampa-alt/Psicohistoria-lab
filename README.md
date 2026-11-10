@@ -60,4 +60,8 @@ Inspirado en la obra literaria de Isaac Asimov, sin afiliación con sus titulare
 
 - EXP-002-C (2026-11-08): puerta de calidad de cobertura explícita en [`src/coverage.py`](src/coverage.py), dos pruebas nuevas y selección documental de COW guerras interestatales v4.0 + membresía estatal como fuentes candidatas. [Protocolo y límites](research/EXP-002-plan.md#avance-diario-002-c-cobertura-explicita-y-seleccion-de-fuente-2026-11-08). **No se descargaron datos reales ni se validaron modelos históricos.**
 
-- EXP-002-D (2026-11-09): [adaptador local COW](src/cow_adapter.py), [pruebas sintéticas](tests/test_cow_adapter.py) y [registro de supuestos y límites](research/EXP-002-plan.md#avance-diario-002-d-adaptador-cow-y-prueba-temporal-sintetica-2026-11-09). **Aún sin datos históricos incorporados, ni validación empírica.**\n\nLos avances futuros deben conservar un historial auditable y evitar duplicar experimentos o repositorios.
+- EXP-002-D (2026-11-09): [adaptador local COW](src/cow_adapter.py), [pruebas sintéticas](tests/test_cow_adapter.py) y [registro de supuestos y límites](research/EXP-002-plan.md#avance-diario-002-d-adaptador-cow-y-prueba-temporal-sintetica-2026-11-09). **Aún sin datos históricos incorporados, ni validación empírica.**
+
+Los avances futuros deben conservar un historial auditable y evitar duplicar experimentos o repositorios.
+
+- EXP-002-E (2026-11-10): [comparación pareada B0/B1](src/compare_baselines.py), [pruebas sintéticas](tests/test_compare_baselines.py) y [protocolo con bootstrap anual](research/EXP-002-plan.md#avance-diario-002-e-contraste-pareado-reproducible-2026-11-10). **Código implementado; sin datos históricos procesados ni capacidad predictiva validada.** La reconciliación de episodios COW continúa pendiente.
