@@ -16,8 +16,8 @@ class CowAdapterTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             d=Path(d)
             system=d/"system.csv"; wars=d/"wars.csv"
-            write(system,["CCode","Year"],[(2,2000),(20,2000),(2,2001),(20,2001),(2,2002),(20,2002)])
-            write(wars,["Ccode","StartYear1","WarNum"],[(2,2000,1),(20,2002,2)])
+            write(system,["ccode","year"],[(2,2000),(20,2000),(2,2001),(20,2001),(2,2002),(20,2002)])
+            write(wars,["ccode","StartYear1","WarNum"],[(2,2000,1),(20,2002,2)])
             result=build_panel(system,wars)
             self.assertEqual(result["metadata"]["positive_state_years"],2)
             self.assertEqual(len(result["panel"]),6)
@@ -30,15 +30,15 @@ class CowAdapterTests(unittest.TestCase):
     def test_reject_unmatched_event(self):
         with tempfile.TemporaryDirectory() as d:
             d=Path(d); s=d/"s.csv"; w=d/"w.csv"
-            write(s,["CCode","Year"],[(2,2000)])
-            write(w,["Ccode","StartYear1","WarNum"],[(20,2000,1)])
+            write(s,["ccode","year"],[(2,2000)])
+            write(w,["ccode","StartYear1","WarNum"],[(20,2000,1)])
             with self.assertRaises(ValueError):
                 build_panel(s,w)
     def test_reject_unknown_onset(self):
         with tempfile.TemporaryDirectory() as d:
             d=Path(d); s=d/"s.csv"; w=d/"w.csv"
-            write(s,["CCode","Year"],[(2,2000)])
-            write(w,["Ccode","StartYear1","WarNum"],[(2,-9,1)])
+            write(s,["ccode","year"],[(2,2000)])
+            write(w,["ccode","StartYear1","WarNum"],[(2,-9,1)])
             with self.assertRaises(ValueError):
                 build_panel(s,w)
 
