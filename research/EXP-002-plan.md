@@ -200,3 +200,25 @@ El corte 1950 es provisional, no una eleccion calibrada. La comparacion progresi
 
 ### Antecedentes y continuidad
 Se mantiene la revision previa de dmely/cliodynamics, O957/awesome-cliodynamics y MidnightLabDev/Civitas; el calculo de Brier y los intervalos se implementan sin copiar codigo ajeno. No se crean tareas ni repositorios adicionales.
+
+## Avance 002-G — Primer camino ejecutable hacia un contraste historico real (2026-11-10)
+
+**Objetivo solicitado:** abandonar la dependencia de ejemplos ficticios y obtener el primer contraste con datos historicos observados.
+
+**Fuentes oficiales confirmadas:**
+- COW guerras interestatales v4.0: https://correlatesofwar.org/wp-content/uploads/Inter-StateWarData_v4.0.csv
+- COW membresia v2024: https://correlatesofwar.org/wp-content/uploads/System2024.zip
+- Codebooks: https://correlatesofwar.org/data-sets/cow-war/ y https://correlatesofwar.org/data-sets/state-system-membership/
+
+**Implementado:** `src/cow_official_run.py` descarga ambas fuentes a una carpeta local, extrae el CSV de membresia del ZIP, conserva hashes SHA-256, invoca el adaptador COW existente y, si no hay errores de reconciliacion, ejecuta B0/B1 en un corte temporal 1950 con comparacion pareada y remuestreo anual. Guarda un reporte JSON con resultado o motivo de bloqueo. `tests/test_cow_official_run.py` comprueba extraccion de ZIP, rechazo de archivos ambiguos y ausencia del CSV.
+
+```bash
+python -m unittest discover -s tests -v
+python -m src.cow_official_run --out-dir resultados_locales/EXP-002-G --test-start 1950
+```
+
+**Restriccion critica:** el adaptador anterior ignora `StartYear2` y los reingresos; aunque el script llegue a producir una comparacion, se etiqueta `comparison_exploratory_not_validated`. El corte 1950 y strength=5 son supuestos fijados por el protocolo anterior, no seleccionados tras inspeccionar el test. No confundir un inicio de participacion en guerra con la prediccion del inicio global de la Segunda Guerra Mundial o la caida de la URSS.
+
+**Evidencia al redactar:** URLs oficiales identificadas y codigo persistido; no se obtuvo aun un CSV real en este entorno ni se ejecuto el pipeline historico. Resultado historico y validacion fuera de muestra: **pendientes**. No publicar ni subir las filas COW al repositorio. Los archivos de terceros quedan locales.
+
+**Antecedentes:** se reutilizan `cow_adapter.py`, `compare_baselines.py`, y las auditorias AUD-003/004; no se duplican modelos ni se crea EXP-003.
