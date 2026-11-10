@@ -168,3 +168,35 @@ El corte 1950 es **ilustrativo y provisional**, no un protocolo fijado mediante 
 Prueba sintética definida en `tests/test_cow_adapter.py`: dos estados (CCode 2,20), 2000–2002; inicios (2,2000) y (20,2002), 6 estado-años y 2 positivos. Para 2001, B0=(1+0.5)/(2+1)=0.5; se contrastan B0/B1 en las mismas 4 observaciones de 2001–2002. Tests de rechazos de evento fuera de cobertura y fecha desconocida. **Las pruebas deben considerarse no ejecutadas hasta verificar el workflow nuevo**.
 
 Estado de evidencia: datos históricos incorporados=0; contraste histórico fuera de muestra=0; hipótesis EXP-001 validada=no. Próxima puerta: obtener archivos oficiales, verificar sus encabezados exactos y su contenido, revisar StartYear2 y reglas de participación y ejecutar la primera comparación con provenance completa.
+
+
+## Avance diario 002-E: contraste pareado reproducible (2026-11-10)
+
+**Estado: codigo y pruebas persistidos; sin ejecucion historica ni validacion predictiva.** Se revisaron README, EXP-002-A/B/C/D, adaptador COW y auditorias existentes antes de escribir. Se conserva el identificador EXP-002, sin crear experimentos o repositorios nuevos.
+
+### Problema y ecuaciones
+Comparar B0 y B1 en el **mismo** conjunto de Estado-anios fuera de muestra, usando los pronosticos emitidos antes de incorporar los outcomes del anio correspondiente. Para N observaciones:
+- BS(Bj) = (1/N) * sum_i (p_ji - y_i)^2.
+- Delta = BS(B1) - BS(B0). Delta negativo favorece B1; positivo favorece B0.
+- Intervalo descriptivo: remuestreo con reemplazo de **bloques de anios completos** del periodo de prueba, conservando todas las entidades de cada anio. Se usa generador pseudoaleatorio con semilla fija y percentiles 2.5 y 97.5 de 1000 replicas por defecto.
+
+Este bootstrap no garantiza cobertura estadistica si hay dependencia serial, shocks globales, cambios de sistema o escasos eventos; es un diagnostico de incertidumbre, no prueba de causalidad. La contraccion B1 (strength=5) sigue siendo arbitraria y debe fijarse antes de observar resultados reales. No seleccionar la variante ganadora con el mismo periodo de prueba y presentarla como confirmacion.
+
+### Implementacion
+- `src/compare_baselines.py`: llama los baselines B0/B1 existentes; comprueba coincidencia exacta de entidad, anio y outcome; reporta N, anios, eventos, Brier de ambos, Delta e intervalo por bloques con semilla reproducible.
+- `tests/test_compare_baselines.py`: tests sintéticos de alineacion, determinismo, parametros invalidos y no dependencia de etiquetas futuras.
+- Comando para panel **local autorizado y auditado**, sin subir datos de COW al repositorio:
+```bash
+python -m unittest discover -s tests -v
+python -m src.compare_baselines resultados_locales/panel.csv --test-start 1950 --strength 5 --bootstrap 1000 --seed 20261110 --output resultados_locales/EXP-002-E-comparacion.json
+```
+El corte 1950 es provisional, no una eleccion calibrada. La comparacion progresiva usa resultados de anios previos al anio evaluado; no equivale a un modelo congelado en 1950.
+
+### Datos y resultados
+- **Datos historicos reales procesados: 0.** No se dispone aun de archivos COW originales auditados y reconciliados.
+- **Supuestos:** membresia Estado-anio, evento StartYear1, prior Beta(0.5,0.5), strength=5, bootstrap anual.
+- **Resultados:** herramienta de comparacion implementada; no se reportan cifras historicas, significacion ni mejora predictiva. Las pruebas CI solo se consideraran superadas al comprobar el run del commit.
+- **Limitacion bloqueante para inferencia:** StartYear2/reingresos y pertenencia parcial en el anio no estan reconciliados en `cow_adapter.py`. El archivo generado sigue marcado constructed_not_validated.
+
+### Antecedentes y continuidad
+Se mantiene la revision previa de dmely/cliodynamics, O957/awesome-cliodynamics y MidnightLabDev/Civitas; el calculo de Brier y los intervalos se implementan sin copiar codigo ajeno. No se crean tareas ni repositorios adicionales.
