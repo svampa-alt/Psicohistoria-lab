@@ -11,9 +11,9 @@ import urllib.request
 from pathlib import Path
 
 SOURCES = {
-    "population": "https://raw.githubusercontent.com/datasets/population/main/data/population.csv",
-    "gdp": "https://raw.githubusercontent.com/datasets/gdp/main/data/gdp.csv",
-    "carbon": "https://raw.githubusercontent.com/datasets/co2-fossil-by-nation/main/data/fossil-fuel-co2-emissions-by-nation.csv",
+    "population": "https://raw.githubusercontent.com/datasets/population/d4b1a4a9a17e2123baf0ef119de05bceced1ab1b/data/population.csv",
+    "gdp": "https://raw.githubusercontent.com/datasets/gdp/36d761dc5617982d3e50b213e02b9a1b47c4e958/data/gdp.csv",
+    "carbon": "https://raw.githubusercontent.com/datasets/co2-fossil-by-nation/a0d67befcba0666850085281dae48a4e81dcd979/data/fossil-fuel-co2-emissions-by-nation.csv",
 }
 COUNTRIES = {"UNITED STATES OF AMERICA": "USA", "UNITED KINGDOM": "GBR", "JAPAN": "JPN"}
 FIELDS = ["country_iso3", "year", "population", "gdp_current_usd",
